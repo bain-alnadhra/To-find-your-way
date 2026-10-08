@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ما بين النظرة والكلمة</title>
+<style>
+@import url('https://googleapis.com');
+*{box-sizing:border-box}
+
+/* تأثير لمعان النجوم */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+#stars span {
+  animation: twinkle 3s infinite ease-in-out !important;
+}
+
+/* تأثير حركة طفو الغيوم */
+@keyframes floatCloud {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+body{
+ margin:0;min-height:100vh;overflow-x:hidden;color:#f8f7ff;
+ font-family:Cairo,system-ui,sans-serif;
+ background:
+ radial-gradient(circle at 15% 15%,rgba(137,157,255,.25),transparent 22%),
+ radial-gradient(circle at 85% 20%,rgba(210,155,255,.18),transparent 23%),
+ radial-gradient(circle at 50% 90%,rgba(73,98,190,.22),transparent 30%),
+ linear-gradient(160deg,#020515,#080d2a 52%,#111742);
+}
+body:before,body:after{content:"";position:fixed;inset:0;pointer-events:none}
+body:before{background-image:radial-gradient(#fff 1px,transparent 1px);background-size:77px 77px;opacity:.45}
+body:after{background-image:radial-gradient(#d8e1ff 1px,transparent 1px);background-size:131px 131px;opacity:.28}
+.starfield span{position:fixed;width:2px;height:2px;background:white;border-radius:50%;opacity:.7;animation:twinkle 3s infinite alternate}
+main{position:relative;z-index:2;max-width:820px;margin:auto;padding:30px 18px 60px}
+.screen{min-height:86vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;animation:fade .55s ease}
+.hidden{display:none!important}
+h1{font-size:clamp(38px,9vw,70px);line-height:1.1;margin:0 0 12px;letter-spacing:-2px}
+h2{font-size:clamp(26px,6vw,42px);margin:0 0 15px;line-height:1.4}
+p{line-height:2;font-size:18px;color:#cbd0e9;max-width:650px}
+.star{font-size:48px;filter:drop-shadow(0 0 18px #aebfff);margin-bottom:12px}
+.subtitle{font-size:15px;color:#9da6d3}
+.card{
+ width:min(700px,100%);padding:30px 24px;border:1px solid rgba(220,228,255,.15);
+ border-radius:30px;background:rgba(7,12,38,.70);backdrop-filter:blur(12px);
+ box-shadow:0 20px 70px rgba(0,0,0,.28)
+}
+.clouds{width:min(690px,100%);display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;margin-top:30px}
+.cloud{
+ position:relative;border:0;cursor:pointer;color:#101633;font:600 16px Cairo;
+ min-height:82px;padding:20px 24px;border-radius:50px;
+ background:linear-gradient(180deg,#fff 0%,#dfe7ff 100%);
+ box-shadow:0 12px 30px rgba(0,0,0,.28),0 0 25px rgba(190,205,255,.16);
+ transition:.25s;isolation:isolate;
+ animation:floatCloud 4s infinite ease-in-out;
+}
+.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%;z-index:-1}
+.cloud:before{width:52px;height:52px;left:25px;top:-13px}
+.cloud:after{width:70px;height:70px;right:25px;top:-25px}
+.cloud:hover{transform:translateY(-5px) scale(1.025);box-shadow:0 18px 40px rgba(0,0,0,.36),0 0 34px rgba(190,205,255,.3)}
+.cloud:active{transform:scale(.98)}
+.choice{
+ display:block;width:100%;margin:12px 0;padding:15px 18px;border-radius:18px;
+ border:1px solid rgba(220,228,255,.16);background:rgba(255,255,255,.07);
+ color:#f7f6ff;font:400 16px Cairo;cursor:pointer;transition:.2s
+}
+.choice:hover{background:rgba(255,255,255,.13);transform:translateY(-2px)}
+.back{margin-top:24px;background:none;border:0;color:#aeb7df;font:400 14px Cairo;cursor:pointer}
+.progress{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:5;color:#8f99c8;font-size:12px}
+.emoji{font-size:45px;margin-bottom:10px}
+.result{font-size:21px;line-height:2;color:#eeeaff}
+.music{
+ position:fixed;bottom:16px;left:16px;z-index:6;width:42px;height:42px;border-radius:50%;
+ border:1px solid rgba(255,255,255,.2);background:rgba(7,12,38,.65);color:white;cursor:pointer
+}
+.credit{position:fixed;bottom:25px;left:66px;z-index:6;font-size:12px;color:#8f99c8;direction:ltr}
+.custom{margin:12px 0}
+.custom input{width:100%;border:1px solid rgba(220,228,255,.18);border-radius:18px;padding:14px 16px;background:rgba(255,255,255,.07);color:#fff;font:400 16px Cairo;outline:none;margin-bottom:8px}
+.custom .choice{margin:0}
+.custom textarea{width:100%;min-height:110px;resize:vertical;border:1px solid rgba(220,228,255,.18);border-radius:18px;padding:14px 16px;background:rgba(255,255,255,.07);color:#fff;font:400 16px Cairo;line-height:1.9;outline:none;margin-bottom:8px}
+.hint{font-size:13px;color:#9da6d3;line-height:1.9;margin-bottom:10px;text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{border:1px solid rgba(220,228,255,.2);background:rgba(190,205,255,.1);color:#dfe5ff;border-radius:999px;padding:7px 13px;font:400 13px Cairo;cursor:pointer}
+.chip:hover{background:rgba(190,205,255,.2)}
+.fld{width:100%;border:1px solid rgba(220,228,255,.18);border-radius:16px;padding:12px 14px;background:rgba(255,255,255,.07);color:#fff;font:400 16px Cairo;outline:none;margin-bottom:6px;line-height:1.9}
+textarea.fld{min-height:80px;resize:vertical}
+.fld.static{color:#cbd0e9}
+.lbl{display:block;margin:14px 0 6px;color:#aeb7df;font-size:14px;text-align:right}
+.chip.sel{background:rgba(190,205,255,.38);border-color:#fff;color:#fff}
+.exhibit{border:1px solid rgba(220,228,255,.18);border-radius:22px;padding:16px 18px;background:rgba(255,255,255,.06);margin:14px 0;text-align:right}
+.exhibit h3{margin:0 0 8px;font-size:22px}
+.badge{display:inline-block;margin-right:10px;padding:2px 12px;border-radius:999px;border:1px solid rgba(220,228,255,.3);font-size:12px;color:#cbd0e9;vertical-align:middle}
+.exhibit .row{font-size:15px;line-height:2;color:#cbd0e9}
+.exhibit .row b{color:#fff}
+footer{font-size:12px;color:#7882b2;margin-top:20px}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes twinkle{from{transform:scale(.7);opacity:.3}to{transform:scale(1.4);opacity:1}}
+</style>
+</head>
+<body>
+<div class="starfield" id="stars"></div>
+<div class="progress" id="progress"></div>
+
+<main>
+<section class="screen" id="home">
+  <div class="star">✦</div>
+  <h1>ما بين النظرة والكلمة</h1>
+  <p>اختار الغيمة اللي تريد نبدأ منها…</p>
+  <div class="clouds">
+    <button class="cloud" onclick="openLove()">☁️ الحب</button>
+    <button class="cloud" onclick="openLoss()">☁️ الفقدان</button>
+    <button class="cloud" onclick="openAnger()">☁️ الغضب</button>
+    <button class="cloud" onclick="openForget()">☁️ النسيان</button>
+    <button class="cloud" onclick="openDescribe()">☁️ الوصف</button>
+    <button class="cloud" onclick="go('museum')">☁️ متحف الأشياء الثمينة</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="love">
+  <div class="star">✦</div>
+  <h2>الحب</h2>
+  <p>أريد أعرف شيئًا واحدًا…<br><b>شنو أول شعور لامس قلبك من شفتني أو حچيت وياي؟</b></p>
+  <div class="clouds">
+    <button class="cloud" onclick="openFirst()">☁️ أول شعور</button>
+    <button class="cloud" onclick="openLook()">☁️ أول نظرة</button>
+    <button class="cloud" onclick="openThought()">☁️ أول فكرة</button>
+    <button class="cloud" onclick="openNote()">☁️ أول ملاحظة</button>
+  </div>
+  <button class="choice" style="width:min(690px,100%);margin-top:18px" onclick="openCustomTopic()">✍️ شيء ثاني، أكتبه بنفسي</button>
+  <p class="subtitle">اختار الغيمة اللي تمثّل الشيء اللي تريد تتذكره أولًا.</p>
+  <button class="back" onclick="go('home')">← أرجع</button>
+</section>
+
+<section class="screen hidden" id="loss">
+  <div class="star">✦</div>
+  <h2>الفقدان</h2>
+  <p>أحيانًا نفتقد أشياء ما نعرف نسميها…<br><b>شنو اللي تفتقده أكثر؟</b></p>
+  <div class="clouds">
+    <button class="cloud" onclick="go('missFeeling')">☁️ تفتقد الشعور</button>
+    <button class="cloud" onclick="go('missPlace')">☁️ تفتقد المكان</button>
+    <button class="cloud" onclick="go('missPerson')">☁️ تفتقد الشخص</button>
+    <button class="cloud" onclick="go('missLabel')">☁️ تفتقد المسمى</button>
+  </div>
+  <button class="choice" style="width:min(690px,100%);margin-top:18px" onclick="openCustomTopic()">✍️ شيء ثاني، أكتبه بنفسي</button>
+  <p class="subtitle">اختار الغيمة اللي أقرب لقلبك هسه.</p>
+  <button class="back" onclick="go('home')">← أرجع</button>
+</section>
+
+
+<section class="screen hidden" id="first">
+  <div class="card">
+    <div class="emoji">🌙</div><h2>أول شعور</h2>
+    <p>خلينا نرجع للحظة الأولى… بدون تفكير كثير. شنو كان أول شيء حسّيته؟</p>
+    <button class="choice" onclick="pick('feeling','فضول','حسّيت أريد أعرف عنك أكثر.')">فضول — أريد أعرف عنك أكثر.</button>
+    <button class="choice" onclick="pick('feeling','راحة','حسّيت بألفة غريبة، كأن وجودك مو غريب.')">راحة — ألفة غريبة.</button>
+    <button class="choice" onclick="pick('feeling','انجذاب','أكو شيء بيك شدّني من البداية.')">انجذاب — شيء بيك شدّني.</button>
+    <button class="choice" onclick="pick('feeling','ارتباك','ما عرفت شنو أحس، بس وجودك لخبطني بطريقة حلوة.')">ارتباك — ما عرفت أسميه.</button>
+    <button class="back" onclick="go('love')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="feelingNext">
+  <div class="card">
+    <div class="emoji">☁️</div><h2>وبعدها؟</h2>
+    <p>بعد ما انتهت أول لحظة، شنو الشيء اللي خلاك تنتبه إليّ أكثر؟</p>
+    <button class="choice" onclick="pick('reason','الكلام','طريقة كلامك والتفاصيل اللي كنت تقولها.')">كلامي وطريقة حچيّي</button>
+    <button class="choice" onclick="pick('reason','الحضور','مجرد وجودي وحضوري.')">حضوري</button>
+    <button class="choice" onclick="pick('reason','التفاصيل','تفاصيل صغيرة ما أعرف ليش بقيت ببالي.')">تفاصيل صغيرة</button>
+    <button class="choice" onclick="pick('reason','الوقت','الوقت اللي قضيته وياي.')">الوقت وياك</button>
+    <button class="back" onclick="go('first')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="look">
+  <div class="card">
+    <div class="emoji">👀</div><h2>أول نظرة</h2>
+    <p>شنو أول شيء لفت انتباهك؟</p>
+    <button class="choice" onclick="pick('look','النظرة','نظرتك وملامحك.')">نظرتي وملامحي</button>
+    <button class="choice" onclick="pick('look','الضحكة','ضحكتك أو تعابير وجهك.')">ضحكتي وتعابيري</button>
+    <button class="choice" onclick="pick('look','الحضور','حضورك كله، مو تفصيل واحد.')">حضوري</button>
+    <button class="choice" onclick="pick('look','شيء غامض','شيء ما قدرت أحدده إلى الآن.')">شيء ما قدرت أحدده</button>
+    <button class="back" onclick="go('love')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="lookNext">
+  <div class="card">
+    <div class="emoji">🌌</div><h2>إذا رجعت للحظة…</h2>
+    <p>هل تعتقد أن أول نظرة كانت مجرد لحظة عابرة، لو كان بيها شيء يستحق التذكر؟</p>
+    <button class="choice" onclick="pick('meaning','عابرة','كانت عابرة، بس بطريقة بقيت بالذاكرة.')">لحظة عابرة</button>
+    <button class="choice" onclick="pick('meaning','مهمة','كان بيها شيء من البداية.')">كان بيها شيء مهم</button>
+    <button class="choice" onclick="pick('meaning','لا أدري','إلى الآن ما أعرف… ولهذا يمكن هي مميزة.')">ما أدري</button>
+    <button class="back" onclick="go('look')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="thought">
+  <div class="card">
+    <div class="emoji">☁️</div><h2>أول فكرة</h2>
+    <p>أول فكرة حقيقية مرت ببالك عني؟</p>
+    <button class="choice" onclick="pick('thought','مختلف','هذا الشخص مختلف.')">«هذا الشخص مختلف.»</button>
+    <button class="choice" onclick="pick('thought','أريد أكثر','أريد أحچي وياه أكثر.')">«أريد أحچي وياه أكثر.»</button>
+    <button class="choice" onclick="pick('thought','فضول','ما أعرف عنه شيء، بس أريد أعرف.')">«أريد أعرف عنه أكثر.»</button>
+    <button class="choice" onclick="pick('thought','مفاجأة','ما توقعت يصير له حضور بذهني.')">«ما توقعت يصير له حضور.»</button>
+    <button class="back" onclick="go('love')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="thoughtNext">
+  <div class="card">
+    <div class="emoji">💭</div><h2>ومع الوقت؟</h2>
+    <p>شنو الشيء اللي تغيّر من أول فكرة إلى الآن؟</p>
+    <button class="choice" onclick="pick('change','قرب','صار وجوده أقرب إليّ.')">صار أقرب</button>
+    <button class="choice" onclick="pick('change','اهتمام','صرت أنتبه لتفاصيل أكثر.')">زاد اهتمامي</button>
+    <button class="choice" onclick="pick('change','فضول','بعدني أريد أعرف أكثر.')">بعدني فضولي</button>
+    <button class="choice" onclick="pick('change','شيء آخر','صار عندي شعور ما أعرف أوصفه.')">صار شيء ما أعرف أوصفه</button>
+    <button class="back" onclick="go('thought')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="note">
+  <div class="card">
+    <div class="emoji">🔭</div><h2>أول ملاحظة</h2>
+    <p>شنو التفصيل الصغير اللي لاحظته بيّ قبل أي شيء ثاني؟</p>
+    <button class="choice" onclick="pick('note','ضحكة','ضحكتك وتعابيرك.')">ضحكتي وتعابيري</button>
+    <button class="choice" onclick="pick('note','كلام','طريقة كلامي واختياري للكلمات.')">طريقة كلامي</button>
+    <button class="choice" onclick="pick('note','هدوء','هدوئي أو طاقتي.')">هدوئي / طاقتي</button>
+    <button class="choice" onclick="pick('note','تفصيل','تفصيل صغير جدًا، بس بقي بذاكرتي.')">تفصيل صغير جدًا</button>
+    <button class="back" onclick="go('love')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="noteNext">
+  <div class="card">
+    <div class="emoji">🫧</div><h2>ليش بقي ببالك؟</h2>
+    <p>إذا كان تفصيل صغير… شنو خلاه يبقى؟</p>
+    <button class="choice" onclick="pick('why','مميز','لأنه كان مميز بطريقة ما.')">لأنه كان مميز</button>
+    <button class="choice" onclick="pick('why','صادق','لأنه حسّيته عفوي وحقيقي.')">لأنه حسّيته حقيقي</button>
+    <button class="choice" onclick="pick('why','يشبهني','لأنه ذكرني بشيء مني.')">لأنه يشبهني بطريقة ما</button>
+    <button class="choice" onclick="pick('why','لا أدري','ما أعرف، بس ما نسيته.')">ما أعرف… بس ما نسيته</button>
+    <button class="back" onclick="go('note')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="meme">
+  <div class="card">
+    <div class="emoji">😭</div>
+    <h2>لحظة…</h2>
+    <p>كل هالإجابات وبالأخير تكول ماكو شعور؟ 👁️👄👁️</p>
+    <div style="font-size:70px;margin:20px">🫵🏻 😂</div>
+    <button class="cloud" onclick="go('finalQuestion')">☁️ كمل التحقيق</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="finalQuestion">
+  <div class="card">
+    <div class="emoji">🌙</div><h2>آخر سؤال</h2>
+    <p>بعيدًا عن كل الإجابات السابقة… إذا توصف شعورك تجاهي بكلمة وحدة، شتختار؟</p>
+    <button class="choice" onclick="finish('اهتمام','يمكن الكلمة الأصدق هي: اهتمام. لأن وجودك صار يعني لي شيء.')">اهتمام</button>
+    <button class="choice" onclick="finish('فضول','فضول… لأن بعدني أريد أعرفك أكثر.')">فضول</button>
+    <button class="choice" onclick="finish('راحة','راحة… لأن وياك ما أحس أني مضطر أكون شخص ثاني.')">راحة</button>
+    <button class="choice" onclick="finish('انجذاب','انجذاب… يمكن البداية كانت أبسط من أني أسميها، بس أكو شيء.')">انجذاب</button>
+    <button class="choice" onclick="finish('شيء لا اسم له','شيء ما عنده اسم لحد الآن… بس أكيد مو لا شيء.')">شيء ما إله اسم</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+
+<section class="screen hidden" id="missFeeling">
+  <div class="card">
+    <div class="emoji">🌙</div><h2>تفتقد الشعور</h2>
+    <p>شنو الشعور اللي تفتقده؟</p>
+    <button class="choice" onclick="pick('mFeel','الأمان','أفتقد الأمان اللي كنت أحسه.')">الأمان اللي كنت أحسه</button>
+    <button class="choice" onclick="pick('mFeel','الشغف','أفتقد شغف الأيام الأولى.')">شغف الأيام الأولى</button>
+    <button class="choice" onclick="pick('mFeel','الدفء','أفتقد دفء بسيط ما أعرف أسميه.')">دفء بسيط ما أعرف أسميه</button>
+    <button class="choice" onclick="pick('mFeel','الحماس','أفتقد حماس الانتظار.')">حماس الانتظار</button>
+    <button class="back" onclick="go('loss')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="missFeelingNext">
+  <div class="card">
+    <div class="emoji">☁️</div><h2>وبعدها؟</h2>
+    <p>ليش تحس هذا الشعور راح؟</p>
+    <button class="choice" onclick="pick('mFeelWhy','تغيّرت الظروف','لأن الظروف تغيّرت.')">تغيّرت الظروف</button>
+    <button class="choice" onclick="pick('mFeelWhy','تغيّرت أنا','لأني أنا تغيّرت.')">تغيّرت أنا</button>
+    <button class="choice" onclick="pick('mFeelWhy','ما رجع مثل أول','لأنه ما رجع مثل أول.')">ما رجع مثل أول</button>
+    <button class="choice" onclick="pick('mFeelWhy','ما أدري','ما أعرف… بس راح.')">ما أدري، بس راح</button>
+    <button class="back" onclick="go('missFeeling')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="missPlace">
+  <div class="card">
+    <div class="emoji">🏡</div><h2>تفتقد المكان</h2>
+    <p>أي مكان تفتقد؟</p>
+    <button class="choice" onclick="pick('mPlace','مكان قديم','مكان قديم بقي بذاكرتي.')">مكان قديم بقي بذاكرتي</button>
+    <button class="choice" onclick="pick('mPlace','مكان الراحة','مكان كنت أحس بي براحة.')">مكان كنت أرتاح بي</button>
+    <button class="choice" onclick="pick('mPlace','مكان وياه ذكريات','مكان مرتبط بذكريات حلوة.')">مكان مرتبط بذكريات حلوة</button>
+    <button class="choice" onclick="pick('mPlace','مكان ما رجعت إله','مكان ما رجعت إله من زمان.')">مكان ما رجعت إله من زمان</button>
+    <button class="back" onclick="go('loss')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="missPlaceNext">
+  <div class="card">
+    <div class="emoji">🌆</div><h2>شنو بالمكان؟</h2>
+    <p>شنو بذاك المكان يوحشك أكثر؟</p>
+    <button class="choice" onclick="pick('mPlaceWhy','الأصوات والروائح','الأصوات والروائح اللي بيه.')">الأصوات والروائح</button>
+    <button class="choice" onclick="pick('mPlaceWhy','الناس','الناس اللي كانوا بيه.')">الناس اللي كانوا بيه</button>
+    <button class="choice" onclick="pick('mPlaceWhy','الهدوء','الهدوء اللي كان بيه.')">الهدوء اللي كان بيه</button>
+    <button class="choice" onclick="pick('mPlaceWhy','نفسي القديمة','نفسي اللي كنت بيها.')">نفسي اللي كنت بيها</button>
+    <button class="back" onclick="go('missPlace')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="missPerson">
+  <div class="card">
+    <div class="emoji">🫂</div><h2>تفتقد الشخص</h2>
+    <p>شنو من هذا الشخص تفتقد؟</p>
+    <button class="choice" onclick="pick('mPerson','صوته','صوته وطريقة حچيه.')">صوته وطريقة حچيه</button>
+    <button class="choice" onclick="pick('mPerson','وجوده','وجوده بقربي.')">وجوده بقربي</button>
+    <button class="choice" onclick="pick('mPerson','اهتمامه','طريقة اهتمامه.')">طريقة اهتمامه</button>
+    <button class="choice" onclick="pick('mPerson','تفاصيله','تفاصيله الصغيرة.')">تفاصيله الصغيرة</button>
+    <button class="back" onclick="go('loss')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="missPersonNext">
+  <div class="card">
+    <div class="emoji">💭</div><h2>لو تگدر…</h2>
+    <p>شنو تتمنى لو تگله هسه؟</p>
+    <button class="choice" onclick="pick('mPersonWhy','اشتقتلك','«اشتقتلك.»')">«اشتقتلك.»</button>
+    <button class="choice" onclick="pick('mPersonWhy','شكرًا','«شكرًا على كل شيء.»')">«شكرًا على كل شيء.»</button>
+    <button class="choice" onclick="pick('mPersonWhy','كنت أريد أبقى','«كنت أريد أبقى.»')">«كنت أريد أبقى.»</button>
+    <button class="choice" onclick="pick('mPersonWhy','ما أدري','ما أعرف شنو أكول، بس أريده يعرف.')">ما أدري، بس أريده يعرف</button>
+    <button class="back" onclick="go('missPerson')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="missLabel">
+  <div class="card">
+    <div class="emoji">🏷️</div><h2>تفتقد المسمى</h2>
+    <p>شنو المسمى اللي تفتقده؟</p>
+    <button class="choice" onclick="pick('mLabel','الاسم','الاسم اللي كانوا يناديني بي.')">الاسم اللي كانوا يناديني بي</button>
+    <button class="choice" onclick="pick('mLabel','الصفة','الصفة اللي كانت تعرّفني عندهم.')">الصفة اللي كانت تعرّفني</button>
+    <button class="choice" onclick="pick('mLabel','اللقب','اللقب اللي كان بيننا.')">اللقب اللي كان بيننا</button>
+    <button class="choice" onclick="pick('mLabel','الانتماء','أن يكون عندي مسمى أنتمي إله.')">أن يكون عندي مسمى أنتمي إله</button>
+    <button class="back" onclick="go('loss')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="missLabelNext">
+  <div class="card">
+    <div class="emoji">🫧</div><h2>شنو يعني لك؟</h2>
+    <p>شنو كان يعني لك هذا المسمى؟</p>
+    <button class="choice" onclick="pick('mLabelWhy','أني محسوب','كان يعني أني محسوب ومهم.')">كان يعني أني محسوب</button>
+    <button class="choice" onclick="pick('mLabelWhy','الانتماء','كان يعني الانتماء.')">كان يعني الانتماء</button>
+    <button class="choice" onclick="pick('mLabelWhy','ذكرى','كان ذكرى حلوة بحد ذاته.')">كان ذكرى حلوة بحد ذاته</button>
+    <button class="choice" onclick="pick('mLabelWhy','ما أعرف','شيء ما أعرف أشرحه.')">شيء ما أعرف أشرحه</button>
+    <button class="back" onclick="go('missLabel')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="lossFinal">
+  <div class="card">
+    <div class="emoji">🌌</div><h2>آخر سؤال</h2>
+    <p>إذا توصف الفقدان بكلمة وحدة، شتختار؟</p>
+    <button class="choice" onclick="finish('شوق','شوق… لأن اللي نحبه يبقى أثره بالقلب.')">شوق</button>
+    <button class="choice" onclick="finish('حنين','حنين… لأن بعض الأيام تبقى حلوة حتى لو راحت.')">حنين</button>
+    <button class="choice" onclick="finish('فراغ','فراغ… مكان كان مليان وهسه ساكت.')">فراغ</button>
+    <button class="choice" onclick="finish('هدوء','هدوء… بعد كل شيء، بقى شيء من السلام.')">هدوء</button>
+    <button class="choice" onclick="finish('شيء لا اسم له','شيء ما عنده اسم لحد الآن… بس أكيد مو لا شيء.')">شيء ما إله اسم</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+
+<section class="screen hidden" id="anger">
+  <div class="star">✦</div>
+  <h2>الغضب</h2>
+  <p>الغضب أحيانًا يكون حزن ما لقى طريقه…<br><b>منو أو شنو غضبان منه؟</b></p>
+  <div class="clouds">
+    <button class="cloud" onclick="go('angerSelf')">☁️ غضبان من نفسك</button>
+    <button class="cloud" onclick="go('angerMemory')">☁️ من الذكريات</button>
+    <button class="cloud" onclick="go('angerFeeling')">☁️ من المشاعر</button>
+    <button class="cloud" onclick="go('angerPerson')">☁️ من الشخص</button>
+  </div>
+  <button class="choice" style="width:min(690px,100%);margin-top:18px" onclick="openCustomTopic()">✍️ شيء ثاني، أكتبه بنفسي</button>
+  <p class="subtitle">اختار الغيمة اللي أقرب لشعورك هسه.</p>
+  <button class="back" onclick="go('home')">← أرجع</button>
+</section>
+
+<section class="screen hidden" id="angerSelf">
+  <div class="card">
+    <div class="emoji">🪞</div><h2>غضبان من نفسك</h2>
+    <p>شنو اللي تلوم نفسك عليه؟</p>
+    <button class="choice" onclick="pick('aSelf','قراراتي','غضبان من قراراتي القديمة.')">قراراتي القديمة</button>
+    <button class="choice" onclick="pick('aSelf','سكوتي','غضبان لأني سكتت وما حچيت.')">لأني سكتت وما حچيت</button>
+    <button class="choice" onclick="pick('aSelf','سمحت','غضبان لأني سمحت يصير اللي صار.')">لأني سمحت يصير اللي صار</button>
+    <button class="choice" onclick="pick('aSelf','توقعت أكثر','غضبان لأني توقعت أكثر من اللازم.')">لأني توقعت أكثر من اللازم</button>
+    <button class="back" onclick="go('anger')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerSelfNext">
+  <div class="card">
+    <div class="emoji">🌧️</div><h2>وهسه؟</h2>
+    <p>شنو تتمنى تسوي وياها؟</p>
+    <button class="choice" onclick="pick('aSelfWhy','أسامح نفسي','أريد أسامح نفسي.')">أسامح نفسي</button>
+    <button class="choice" onclick="pick('aSelfWhy','أتعلم','أريد أتعلم من اللي صار.')">أتعلم من اللي صار</button>
+    <button class="choice" onclick="pick('aSelfWhy','أبتعد','أريد أبتعد شوي حتى أرتاح.')">أبتعد شوي</button>
+    <button class="choice" onclick="pick('aSelfWhy','ما أدري','ما أعرف… بعدني أحاول.')">ما أدري، بعدني أحاول</button>
+    <button class="back" onclick="go('angerSelf')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerMemory">
+  <div class="card">
+    <div class="emoji">📷</div><h2>غضبان من الذكريات</h2>
+    <p>أي نوع من الذكريات؟</p>
+    <button class="choice" onclick="pick('aMem','ذكرى تلحقني','ذكرى معينة تلحقني وين ما أروح.')">ذكرى تلحقني وين ما أروح</button>
+    <button class="choice" onclick="pick('aMem','حلوة صارت تؤلم','ذكريات حلوة صارت تؤلم.')">ذكريات حلوة صارت تؤلم</button>
+    <button class="choice" onclick="pick('aMem','ما اكتملت','ذكرى ما اكتملت.')">ذكرى ما اكتملت</button>
+    <button class="choice" onclick="pick('aMem','ما أريدها','ذكريات ما أريدها ترجع.')">ذكريات ما أريدها ترجع</button>
+    <button class="back" onclick="go('anger')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerMemoryNext">
+  <div class="card">
+    <div class="emoji">🌫️</div><h2>لما تتذكر…</h2>
+    <p>شنو يصير وياك لما تتذكر؟</p>
+    <button class="choice" onclick="pick('aMemWhy','أنزعج','أنزعج وأحاول أغير تفكيري.')">أنزعج وأغير تفكيري</button>
+    <button class="choice" onclick="pick('aMemWhy','أحزن','أحزن بصمت.')">أحزن بصمت</button>
+    <button class="choice" onclick="pick('aMemWhy','أسكت','أسكت وما أحچي.')">أسكت وما أحچي</button>
+    <button class="choice" onclick="pick('aMemWhy','أبتسم وأتألم','أبتسم وبنفس الوقت أتألم.')">أبتسم وأتألم</button>
+    <button class="back" onclick="go('angerMemory')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerFeeling">
+  <div class="card">
+    <div class="emoji">🔥</div><h2>غضبان من المشاعر</h2>
+    <p>شنو اللي يضايقك بالمشاعر؟</p>
+    <button class="choice" onclick="pick('aFeel','ما تسمع كلامي','لأنها ما تسمع كلامي.')">لأنها ما تسمع كلامي</button>
+    <button class="choice" onclick="pick('aFeel','ضعّفتني','لأنها ضعّفتني.')">لأنها ضعّفتني</button>
+    <button class="choice" onclick="pick('aFeel','ما اختفت','لأنها ما اختفت.')">لأنها ما اختفت</button>
+    <button class="choice" onclick="pick('aFeel','جاءت بوقت غلط','لأنها جاءت بوقت غلط.')">لأنها جاءت بوقت غلط</button>
+    <button class="back" onclick="go('anger')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerFeelingNext">
+  <div class="card">
+    <div class="emoji">🌊</div><h2>وشنو تسوي وياها؟</h2>
+    <p>لما تحس بهالشعور، شنو تسوي؟</p>
+    <button class="choice" onclick="pick('aFeelWhy','أتجاهلها','أتجاهلها حتى تروح.')">أتجاهلها</button>
+    <button class="choice" onclick="pick('aFeelWhy','أحچي عنها','أحچي عنها وأفضفض.')">أحچي عنها</button>
+    <button class="choice" onclick="pick('aFeelWhy','أنتظرها تروح','أنتظرها تروح بوقتها.')">أنتظرها تروح</button>
+    <button class="choice" onclick="pick('aFeelWhy','ما أعرف','ما أعرف شنو أسوي وياها.')">ما أعرف</button>
+    <button class="back" onclick="go('angerFeeling')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerPerson">
+  <div class="card">
+    <div class="emoji">🌪️</div><h2>غضبان من الشخص</h2>
+    <p>شنو اللي ضايقك منه؟</p>
+    <button class="choice" onclick="pick('aPers','كلامه','كلامه جرحني.')">كلامه جرحني</button>
+    <button class="choice" onclick="pick('aPers','سكوته','سكوته آذاني.')">سكوته آذاني</button>
+    <button class="choice" onclick="pick('aPers','تغيّره','تغيّره عليّ.')">تغيّره عليّ</button>
+    <button class="choice" onclick="pick('aPers','تعلقي به','أني تعلقت بي أكثر من اللازم.')">أني تعلقت بي أكثر من اللازم</button>
+    <button class="back" onclick="go('anger')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerPersonNext">
+  <div class="card">
+    <div class="emoji">💬</div><h2>لو يسمعك…</h2>
+    <p>شنو تريد منه هسه؟</p>
+    <button class="choice" onclick="pick('aPersWhy','اعتذار','أريد اعتذار.')">أريد اعتذار</button>
+    <button class="choice" onclick="pick('aPersWhy','توضيح','أريد توضيح.')">أريد توضيح</button>
+    <button class="choice" onclick="pick('aPersWhy','ابتعاد','أريد نبتعد عن بعض.')">أريد ابتعاد</button>
+    <button class="choice" onclick="pick('aPersWhy','ولا شي','ما أريد منه شيء.')">ما أريد منه شيء</button>
+    <button class="back" onclick="go('angerPerson')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="angerFinal">
+  <div class="card">
+    <div class="emoji">🌌</div><h2>آخر سؤال</h2>
+    <p>إذا توصف غضبك بكلمة وحدة، شتختار؟</p>
+    <button class="choice" onclick="finish('خيبة','خيبة… لأن الأمل كان أكبر من اللي صار.')">خيبة</button>
+    <button class="choice" onclick="finish('ألم','ألم… والغضب كان بس طريقه للظهور.')">ألم</button>
+    <button class="choice" onclick="finish('تعب','تعب… ومحتاج راحة قبل أي شيء.')">تعب</button>
+    <button class="choice" onclick="finish('عتب','عتب… لأن اللي نغضب منه غالبًا يهمنا.')">عتب</button>
+    <button class="choice" onclick="finish('شيء لا اسم له','شيء ما عنده اسم لحد الآن… بس أكيد مو لا شيء.')">شيء ما إله اسم</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="forget">
+  <div class="card">
+    <div class="emoji">🌫️</div><h2>النسيان</h2>
+    <p>شنو وضعك مع النسيان؟</p>
+    <button class="choice" onclick="pick('fState','أريد أنسى','أريد أنسى.')">أريد أنسى</button>
+    <button class="choice" onclick="pick('fState','نسيت','نسيت فعلًا.')">نسيت فعلًا</button>
+    <button class="choice" onclick="pick('fState','أحاول','أحاول أنسى وما أكدر.')">أحاول وما أكدر</button>
+    <button class="choice" onclick="openCustomTopic()">✍️ شيء ثاني، أكتبه بنفسي</button>
+    <button class="back" onclick="go('home')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="forgetWhat">
+  <div class="card">
+    <div class="emoji">🕯️</div><h2>شنو بالضبط؟</h2>
+    <p>شنو الشيء اللي تريد تنساه، أو نسيته؟</p>
+    <button class="choice" onclick="pick('fWhat','شعور','شعور معين.')">شعور معين</button>
+    <button class="choice" onclick="pick('fWhat','ذكرى','ذكرى أو موقف.')">ذكرى أو موقف</button>
+    <button class="choice" onclick="pick('fWhat','شخص','شخص.')">شخص</button>
+    <button class="choice" onclick="pick('fWhat','نفسي القديمة','نسخة قديمة مني.')">نسخة قديمة مني</button>
+    <button class="back" onclick="go('forget')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="forgetWhy">
+  <div class="card">
+    <div class="emoji">🌙</div><h2>وليش؟</h2>
+    <p>وشنو السبب؟</p>
+    <button class="choice" onclick="pick('fWhy','أرتاح','حتى أرتاح.')">حتى أرتاح</button>
+    <button class="choice" onclick="pick('fWhy','يؤلمني','لأنه يؤلمني.')">لأنه يؤلمني</button>
+    <button class="choice" onclick="pick('fWhy','أكمل','حتى أكمل حياتي.')">حتى أكمل حياتي</button>
+    <button class="choice" onclick="pick('fWhy','ما يستاهل','لأنه ما يستاهل أبقى أفكر بي.')">لأنه ما يستاهل</button>
+    <button class="back" onclick="go('forgetWhat')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="forgetFinal">
+  <div class="card">
+    <div class="emoji">🌌</div><h2>آخر سؤال</h2>
+    <p>إذا توصف النسيان بكلمة وحدة، شتختار؟</p>
+    <button class="choice" onclick="finish('راحة','راحة… لأن بعض الأشياء ثقيلة وحتى الحچي عنها يتعب.')">راحة</button>
+    <button class="choice" onclick="finish('سلام','سلام… لأن النسيان أحيانًا يكون مسامحة.')">سلام</button>
+    <button class="choice" onclick="finish('بداية جديدة','بداية جديدة… وخطوة صغيرة تكفي هسه.')">بداية جديدة</button>
+    <button class="choice" onclick="finish('ما أكدر','ما أكدر أنسى… وهذا مو ضعف، هذا لأنه كان مهم.')">ما أكدر أنسى</button>
+    <button class="choice" onclick="finish('شيء لا اسم له','شيء ما عنده اسم لحد الآن… بس أكيد مو لا شيء.')">شيء ما إله اسم</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="describe">
+  <div class="card">
+    <div class="emoji">🎭</div><h2>الوصف</h2>
+    <p>أحيانًا الكلمات ما تكفي… فوصف شعورك بمشهد أو صورة.</p>
+    <div class="hint">وين أنت؟ شنو تشوف؟ شنو تسمع؟ شنو تحس بقلبك؟ وإذا صعب عليك، اختار بداية من تحت وكمّلها بكلماتك.</div>
+    <div class="chips" id="sceneChips"></div>
+    <textarea id="sceneInput" maxlength="400" placeholder="أحس وكأني…"
+      style="width:100%;min-height:150px;resize:vertical;border:1px solid rgba(220,228,255,.18);
+      border-radius:22px;padding:18px;background:rgba(255,255,255,.07);color:#fff;
+      font:400 16px Cairo;outline:none;line-height:2;"></textarea>
+    <button class="cloud" style="margin-top:22px" onclick="saveScene()">☁️ التالي</button>
+    <button class="back" onclick="go('home')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="describeFinal">
+  <div class="card">
+    <div class="emoji">🌌</div><h2>آخر سؤال</h2>
+    <p>إذا تسمّي هالمشهد بكلمة وحدة، شتختار؟</p>
+    <button class="choice" onclick="finish('حزن','حزن… وحتى الحزن إله طريقة حلوة يعبّر بيها.')">حزن</button>
+    <button class="choice" onclick="finish('شوق','شوق… لأن اللي نحبه يبقى أثره بالقلب.')">شوق</button>
+    <button class="choice" onclick="finish('حب','حب… بس بطريقة ما تنقال بسهولة.')">حب</button>
+    <button class="choice" onclick="finish('غضب','غضب… وغالبًا وراه شيء يهمك.')">غضب</button>
+    <button class="choice" onclick="finish('راحة','راحة… وجودها لحاله يكفي.')">راحة</button>
+    <button class="choice" onclick="finish('شيء لا اسم له','شيء ما عنده اسم لحد الآن… بس أكيد مو لا شيء.')">شيء ما إله اسم</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="customTopic">
+  <div class="card">
+    <div class="emoji">✍️</div><h2>بكلماتك أنت</h2>
+    <p id="customPrompt"></p>
+    <textarea id="customInput" maxlength="300" placeholder="اكتب هنا…"
+      style="width:100%;min-height:150px;resize:vertical;border:1px solid rgba(220,228,255,.18);
+      border-radius:22px;padding:18px;background:rgba(255,255,255,.07);color:#fff;
+      font:400 16px Cairo;outline:none;line-height:2;"></textarea>
+    <button class="cloud" style="margin-top:22px" onclick="saveCustomTopic()">☁️ التالي</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="customQ1">
+  <div class="card">
+    <div class="emoji">🌙</div><h2>وصلني كلامك</h2>
+    <p id="customQuote" style="font-style:italic"></p>
+    <p>شنو أقرب شعور لهذا الشيء؟</p>
+    <button class="choice" onclick="pick('cFeel','دفء','أحس بدفء وراحة.')">دفء وراحة</button>
+    <button class="choice" onclick="pick('cFeel','ألم','أحس بألم.')">ألم</button>
+    <button class="choice" onclick="pick('cFeel','ارتباك','أحس بارتباك وما أعرف أسميه.')">ارتباك — ما أعرف أسميه</button>
+    <button class="choice" onclick="pick('cFeel','اشتياق','أحس باشتياق.')">اشتياق</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="customQ2">
+  <div class="card">
+    <div class="emoji">☁️</div><h2>وهسه؟</h2>
+    <p>شنو تتمنى بخصوص هذا الشيء؟</p>
+    <button class="choice" onclick="pick('cWish','يرجع','أتمنى يرجع مثل ما كان.')">يرجع مثل ما كان</button>
+    <button class="choice" onclick="pick('cWish','أنساه','أتمنى أنساه.')">أنساه</button>
+    <button class="choice" onclick="pick('cWish','أفهمه','أتمنى أفهمه أكثر.')">أفهمه أكثر</button>
+    <button class="choice" onclick="pick('cWish','أتقبّله','أتمنى أتقبّله وأكمل.')">أتقبّله وأكمل</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="museum">
+  <div class="star">🏛️</div>
+  <h2>متحف الأشياء الثمينة</h2>
+  <p>أشياء ثمينة تستحق مكان يحفظها…<br><b>أي متحف تريد تدخل؟</b></p>
+  <div class="clouds">
+    <button class="cloud" onclick="openRoom('ended')">☁️ متحف الأشياء المنتهية</button>
+    <button class="cloud" onclick="openRoom('ongoing')">☁️ متحف الأشياء المستمرة</button>
+  </div>
+  <button class="back" onclick="go('home')">← أرجع</button>
+</section>
+
+<section class="screen hidden" id="room">
+  <div class="card">
+    <div class="emoji" id="roomEmoji">🏛️</div><h2 id="roomTitle"></h2>
+    <p id="roomSub"></p>
+    <div id="roomList"></div>
+    <button class="cloud" style="margin-top:18px" onclick="openForm()">☁️ أضف معروضًا</button>
+    <p class="subtitle" style="margin-top:18px">المعروضات تنحفظ على جهازك أنت فقط، وما تنرسل لأي مكان.</p>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="exhibitForm">
+  <div class="card" style="text-align:right">
+    <div class="emoji" style="text-align:center">🏛️</div><h2 style="text-align:center">معروض جديد</h2>
+    <label class="lbl">المعرض</label>
+    <div class="chips" id="exTypeChips"></div>
+    <input class="fld" id="exTypeOther" type="text" maxlength="40" placeholder="أو اكتبه بنفسك…">
+    <label class="lbl">الحالة</label>
+    <div class="fld static" id="exStatus"></div>
+    <div id="exEndWrap">
+      <label class="lbl">تاريخ الانتهاء</label>
+      <input class="fld" id="exEnd" type="text" maxlength="40" placeholder="مثال: صيف 2021 أو 12/3/2021">
+    </div>
+    <label class="lbl">تاريخ البداية</label>
+    <input class="fld" id="exStart" type="text" maxlength="40" placeholder="مثال: 2018 أو أول سنة بالجامعة">
+    <label class="lbl">سبب الحفظ</label>
+    <textarea class="fld" id="exWhy" maxlength="300" placeholder="ليش تريد تحفظه بالمتحف؟"></textarea>
+    <label class="lbl">شعورك وأنت تكتب</label>
+    <div class="chips" id="exFeelChips"></div>
+    <textarea class="fld" id="exFeel" maxlength="200" placeholder="شنو تحس هسه؟"></textarea>
+    <button class="cloud" style="margin-top:22px" onclick="saveExhibit()">☁️ علّقه بالمتحف</button>
+    <button class="back" onclick="goBack()">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="message">
+  <div class="card">
+    <div class="emoji">💌</div>
+    <h2>هسه دورك تحچي</h2>
+    <p>بعد كل هالأسئلة… إذا عندك شيء تريد توجهه للشخص المقابل، اكتبه هنا.</p>
+    <textarea id="messageInput" maxlength="1000"
+      placeholder="اكتب رسالتك هنا…"
+      style="width:100%;min-height:190px;resize:vertical;border:1px solid rgba(220,228,255,.18);
+      border-radius:22px;padding:18px;background:rgba(255,255,255,.07);color:#fff;
+      font:400 16px Cairo;outline:none;line-height:2;"></textarea>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;color:#858eb8;font-size:12px">
+      <span>اكتبها مثل ما تحب، بدون إجابة صحيحة أو خاطئة.</span>
+      <span id="counter">0 / 1000</span>
+    </div>
+    <button class="cloud" style="margin-top:22px" onclick="submitMessage()">☁️ أرسل الرسالة</button>
+    <button class="back" onclick="go(finals[topic]||'finalQuestion')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="result">
+  <div class="card">
+    <div class="star">✦</div><h2>إذن…</h2>
+    <p id="resultText" class="result"></p>
+    <p id="resultExtra"></p>
+    <div style="font-size:42px;margin:18px">🌌 ☁️ ✦</div>
+    <button class="cloud" onclick="go('home')">☁️ أريد أرجع</button>
+    <footer>بعض المشاعر تبدأ قبل أن نعرف اسمها.</footer>
+  </div>
+</section>
+</main>
+
+<button class="music" onclick="var a=document.getElementById('audio'); a.paused?a.play():a.pause();" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">🎵</button>
+<audio id="audio" loop preload="auto">
+  <source src="Como El Alamo Al Camino (Album Version)(M4A_128K).m4a" type="audio/mp4">
+</audio>
+
+<script>
+ window.alert = function() { };
+const stars=document.getElementById('stars');
+for(let i=0;i<75;i++){
+ const s=document.createElement('span');
+ s.style.left=Math.random()*100+'vw';
+ s.style.top=Math.random()*100+'vh';
+ s.style.animationDelay=(Math.random()*3)+'s';
+ stars.appendChild(s);
+}
+const names={home:'',customQ1:'02',customQ2:'03',customTopic:'01',describe:'01',describeFinal:'✦',anger:'',forget:'01',forgetWhat:'02',forgetWhy:'03',forgetFinal:'✦',angerFinal:'✦',angerSelf:'01',angerSelfNext:'02',angerMemory:'01',angerMemoryNext:'02',angerFeeling:'01',angerFeelingNext:'02',angerPerson:'01',angerPersonNext:'02',love:'',loss:'',missFeeling:'01',missFeelingNext:'02',missPlace:'01',missPlaceNext:'02',missPerson:'01',missPersonNext:'02',missLabel:'01',missLabelNext:'02',lossFinal:'✦',first:'01',feelingNext:'02',look:'01',lookNext:'02',thought:'01',thoughtNext:'02',note:'01',noteNext:'02',meme:'✦',finalQuestion:'✦',message:'✦',result:'✦'};
+let cur='home',hist=[];
+function show(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+ document.getElementById('progress').textContent=names[id]||'';
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function go(id){
+ if(id==='home')hist=[];
+ else if(id!==cur)hist.push(cur);
+ cur=id;show(id);
+}
+function goBack(){
+ cur=hist.pop()||'home';show(cur);
+}
+let answers={};
+let topic='love';
+const finals={love:'finalQuestion',loss:'lossFinal',anger:'angerFinal',forget:'forgetFinal',describe:'describeFinal'};
+function openAnger(){topic='anger';answers={};go('anger')}
+const SCENES=[
+ 'كأني أمٌّ فقدت ابنها…',
+ 'كأني غريب يرجع لبيته القديم…',
+ 'كأني أسمع صوتًا من بعيد وما أكدر أوصله…',
+ 'كأني نار انطفت وبعدها رمادها دافي…',
+ 'كأني أحچي وما أحد يسمعني…',
+ 'كأني طفل ضاع بالزحمة…',
+ 'كأني بحر هادئ من برا وموج من جوا…'
+];
+(function(){
+ const box=document.getElementById('sceneChips'),input=document.getElementById('sceneInput');
+ SCENES.forEach(t=>{
+  const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=t;
+  c.onclick=function(){input.value=t+' ';input.focus();};
+  box.appendChild(c);
+ });
+})();
+function openDescribe(){topic='describe';answers={};document.getElementById('sceneInput').value='';go('describe')}
+function saveScene(){
+ const input=document.getElementById('sceneInput');
+ const v=input.value.trim();
+ if(!v){input.focus();input.placeholder='اكتب وصفك أولًا… ✍️';return;}
+ answers.scene={label:'وصف',text:v};
+ go('describeFinal');
+}
+const CUSTOM_PROMPTS={
+ love:'إذا اللي حسّيته مو موجود بالخيارات… اكتب شعورك أو لحظتك الأولى بكلماتك.',
+ loss:'إذا اللي تفتقده مو موجود بالخيارات… اكتبه بكلماتك.',
+ forget:'إذا اللي تريد تنساه (أو نسيته) مو موجود بالخيارات… اكتبه بكلماتك.',
+ anger:'إذا غضبك من شيء ثاني… اكتب منو أو شنو غضبان منه بكلماتك.'
+};
+function openCustomTopic(){
+ document.getElementById('customPrompt').textContent=CUSTOM_PROMPTS[topic]||'اكتب بكلماتك.';
+ document.getElementById('customInput').value='';
+ go('customTopic');
+}
+function saveCustomTopic(){
+ const input=document.getElementById('customInput');
+ const v=input.value.trim();
+ if(!v){input.focus();input.placeholder='اكتب شيئًا أولًا… ✍️';return;}
+ answers.custom={label:v.length>30?v.slice(0,30)+'…':v,text:v};
+ document.getElementById('customQuote').textContent='«'+v+'»';
+ go('customQ1');
+}
+function openForget(){topic='forget';answers={};go('forget')}
+function openLove(){topic='love';answers={};go('love')}
+function openLoss(){topic='loss';answers={};go('loss')}
+function openFirst(){go('first')}
+function openLook(){go('look')}
+function openThought(){go('thought')}
+function openNote(){go('note')}
+function pick(key,label,text){
+  answers[key]={label,text};
+  const next={feeling:'feelingNext',reason:'meme',look:'lookNext',meaning:'meme',
+              thought:'thoughtNext',change:'meme',note:'noteNext',why:'meme',
+              cFeel:'customQ2',mFeel:'missFeelingNext',mFeelWhy:'lossFinal',mPlace:'missPlaceNext',mPlaceWhy:'lossFinal',
+              mPerson:'missPersonNext',mPersonWhy:'lossFinal',mLabel:'missLabelNext',mLabelWhy:'lossFinal',
+              aSelf:'angerSelfNext',aSelfWhy:'angerFinal',aMem:'angerMemoryNext',aMemWhy:'angerFinal',
+              aFeel:'angerFeelingNext',aFeelWhy:'angerFinal',aPers:'angerPersonNext',aPersWhy:'angerFinal',
+              fState:'forgetWhat',fWhat:'forgetWhy',fWhy:'forgetFinal'};
+  go(key==='cWish'?(finals[topic]||'finalQuestion'):(next[key]||'meme'));
+}
+function finish(label,text){
+  answers.final={label,text};
+  go('message');
+}
+function submitMessage(){
+  const input=document.getElementById('messageInput');
+  const message=input.value.trim();
+  if(!message){
+    input.focus();
+    input.placeholder='اكتب رسالة أولًا… 💌';
+    return;
+  }
+  const sc=answers.scene||answers.custom;
+  const sceneHtml=sc?'<b>'+(answers.scene?'وصفك:':'بكلماتك:')+'</b><span style="display:block;margin:12px 0 22px;padding:18px;border-radius:20px;background:rgba(255,255,255,.07);line-height:2.1;">'+escapeHtml(sc.text)+'</span>':'';
+  const chosen=Object.values(answers).filter(x=>x&&x!==sc).map(x=>x.label).slice(0,5).join('، ');
+  document.getElementById('resultText').textContent=answers.final.text;
+  document.getElementById('resultExtra').innerHTML = sceneHtml +
+    '<b>ورسالتك:</b><br><span style="display:block;margin-top:12px;padding:18px;border-radius:20px;background:rgba(255,255,255,.07);line-height:2.1;">'+escapeHtml(message)+'</span>'+
+    '<small style="display:block;margin-top:15px;color:#858eb8;">ومن بين اختياراتك ظهر: '+escapeHtml(chosen||'شعور ما زال يتكوّن')+'</small>';
+  go('result');
+}
+function escapeHtml(text){
+  return text.replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m];});
+}
+document.getElementById('messageInput').addEventListener('input',function(){
+ document.getElementById('counter').textContent=this.value.length+' / 1000';
+});
+function toggleMusic(){
+ const a=document.getElementById('audio');
+ if(a.paused)a.play().catch(()=>alert('ملف الموسيقى (como_el_alamo.mp3) غير موجود بالموقع بعد.'));
+ else a.pause();
+}
+
+const EX_TYPES=['صداقة','حب','مرحلة','حلم','شخص','نسخة قديمة'];
+const EX_FEELS=['حنين','امتنان','حزن','راحة','ارتباك'];
+const ROOMS={
+ ended:{title:'متحف الأشياء المنتهية',emoji:'🕯️',sub:'أشياء كانت إلك… وانتهت، بس بقى أثرها.',status:'منتهي'},
+ ongoing:{title:'متحف الأشياء المستمرة',emoji:'🌿',sub:'أشياء ثمينة لسه بحياتك، وتريد تحفظها وهي حيّة.',status:'مستمر'}
+};
+let room='ended',pickedType='';
+let museumMem={ended:[],ongoing:[]};
+try{const d=JSON.parse(localStorage.getItem('museum_v1')||'null');if(d&&Array.isArray(d.ended)&&Array.isArray(d.ongoing))museumMem=d;}catch(e){}
+function persistMuseum(){try{localStorage.setItem('museum_v1',JSON.stringify(museumMem));}catch(e){}}
+(function(){
+ const tb=document.getElementById('exTypeChips'),other=document.getElementById('exTypeOther');
+ EX_TYPES.forEach(t=>{
+  const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=t;
+  c.onclick=function(){pickedType=t;other.value='';tb.querySelectorAll('.chip').forEach(x=>x.classList.toggle('sel',x===c));};
+  tb.appendChild(c);
+ });
+ other.addEventListener('input',function(){
+  if(this.value.trim()){pickedType='';tb.querySelectorAll('.chip').forEach(x=>x.classList.remove('sel'));}
+ });
+ const fb=document.getElementById('exFeelChips'),fi=document.getElementById('exFeel');
+ EX_FEELS.forEach(t=>{
+  const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=t;
+  c.onclick=function(){const v=fi.value.trim();fi.value=v?v+'، '+t:t;fi.focus();};
+  fb.appendChild(c);
+ });
+})();
+function openRoom(r){room=r;renderRoom();go('room');}
+function renderRoom(){
+ const R=ROOMS[room];
+ document.getElementById('roomEmoji').textContent=R.emoji;
+ document.getElementById('roomTitle').textContent=R.title;
+ document.getElementById('roomSub').textContent=R.sub;
+ const list=document.getElementById('roomList');list.innerHTML='';
+ const items=museumMem[room];
+ if(!items.length){
+  const e=document.createElement('p');e.className='subtitle';
+  e.textContent='القاعة فاضية لحد الآن. أضف أول معروض.';
+  list.appendChild(e);
+ }
+ items.forEach((it,i)=>{
+  const card=document.createElement('div');card.className='exhibit';
+  const h=document.createElement('h3');h.textContent=it.type;
+  const b=document.createElement('span');b.className='badge';b.textContent=it.status;
+  h.appendChild(b);card.appendChild(h);
+  [['تاريخ البداية',it.start],['تاريخ الانتهاء',it.end],['سبب الحفظ',it.why],['شعورك وأنت تكتب',it.feel]].forEach(r=>{
+   if(!r[1])return;
+   const row=document.createElement('div');row.className='row';
+   const lb=document.createElement('b');lb.textContent=r[0]+': ';
+   row.appendChild(lb);row.appendChild(document.createTextNode(r[1]));
+   card.appendChild(row);
+  });
+  const del=document.createElement('button');del.className='back';del.style.marginTop='8px';
+  del.textContent='🗑 احذفه من المتحف';
+  del.onclick=function(){
+   if(confirm('تحذف هذا المعروض من المتحف؟')){museumMem[room].splice(i,1);persistMuseum();renderRoom();}
+  };
+  card.appendChild(del);list.appendChild(card);
+ });
+}
+function openForm(){
+ pickedType='';
+ ['exTypeOther','exEnd','exStart','exWhy','exFeel'].forEach(id=>document.getElementById(id).value='');
+ document.querySelectorAll('#exTypeChips .chip').forEach(x=>x.classList.remove('sel'));
+ document.getElementById('exStatus').textContent=ROOMS[room].status;
+ document.getElementById('exEndWrap').classList.toggle('hidden',room!=='ended');
+ go('exhibitForm');
+}
+function saveExhibit(){
+ const val=id=>document.getElementById(id).value.trim();
+ const type=val('exTypeOther')||pickedType;
+ if(!type){
+  const o=document.getElementById('exTypeOther');o.focus();o.placeholder='اختار نوع المعرض أو اكتبه… ✍️';return;
+ }
+ museumMem[room].unshift({type:type,status:ROOMS[room].status,end:room==='ended'?val('exEnd'):'',start:val('exStart'),why:val('exWhy'),feel:val('exFeel')});
+ persistMuseum();
+ goBack();renderRoom();
+}
+function addCustomOptions(){
+ document.querySelectorAll('.card').forEach(card=>{
+  const first=card.querySelector('.choice');
+  if(!first)return;
+  if(card.querySelector('[onclick^="openCustomTopic"]'))return;
+  const m=(first.getAttribute('onclick')||'').match(/^(pick|finish)\('([^']*)'/);
+  if(!m)return;
+  const isFinal=m[1]==='finish',key=m[2];
+  const toggle=document.createElement('button');
+  toggle.className='choice';toggle.textContent='✍️ شيء ثاني، أكتبه بنفسي';
+  const box=document.createElement('div');box.className='custom hidden';
+  const input=document.createElement('input');input.type='text';input.maxLength=120;
+  input.placeholder='اكتب وصفك أنت…';
+  const ok=document.createElement('button');ok.className='choice';ok.textContent='تأكيد ✦';
+  const send=function(){
+   const v=input.value.trim();
+   if(!v){input.focus();return;}
+   if(isFinal)finish(v,'«'+v+'»… هذا وصفك أنت، وهو الأصدق.');
+   else pick(key,v,'بكلماتي: '+v);
+   input.value='';box.classList.add('hidden');
+  };
+  ok.onclick=send;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
+  toggle.onclick=function(){box.classList.toggle('hidden');if(!box.classList.contains('hidden'))input.focus();};
+  box.appendChild(input);box.appendChild(ok);
+  const back=card.querySelector('.back');
+  if(back){card.insertBefore(toggle,back);card.insertBefore(box,back);}
+  else{card.appendChild(toggle);card.appendChild(box);}
+ });
+}
+addCustomOptions();
+</script>
+</body>
+</html>
