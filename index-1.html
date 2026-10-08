@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ما بين النظرة والكلمة</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;overflow-x:hidden;color:#f8f7ff;
+ font-family:Cairo,system-ui,sans-serif;
+ background:
+ radial-gradient(circle at 15% 15%,rgba(137,157,255,.25),transparent 22%),
+ radial-gradient(circle at 85% 20%,rgba(210,155,255,.18),transparent 23%),
+ radial-gradient(circle at 50% 90%,rgba(73,98,190,.22),transparent 30%),
+ linear-gradient(160deg,#020515,#080d2a 52%,#111742);
+}
+body:before,body:after{content:"";position:fixed;inset:0;pointer-events:none}
+body:before{background-image:radial-gradient(#fff 1px,transparent 1px);background-size:77px 77px;opacity:.45}
+body:after{background-image:radial-gradient(#d8e1ff 1px,transparent 1px);background-size:131px 131px;opacity:.28}
+.starfield span{position:fixed;width:2px;height:2px;background:white;border-radius:50%;opacity:.7;animation:twinkle 3s infinite alternate}
+main{position:relative;z-index:2;max-width:820px;margin:auto;padding:30px 18px 60px}
+.screen{min-height:86vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;animation:fade .55s ease}
+.hidden{display:none!important}
+h1{font-size:clamp(38px,9vw,70px);line-height:1.1;margin:0 0 12px;letter-spacing:-2px}
+h2{font-size:clamp(26px,6vw,42px);margin:0 0 15px;line-height:1.4}
+p{line-height:2;font-size:18px;color:#cbd0e9;max-width:650px}
+.star{font-size:48px;filter:drop-shadow(0 0 18px #aebfff);margin-bottom:12px}
+.subtitle{font-size:15px;color:#9da6d3}
+.card{
+ width:min(700px,100%);padding:30px 24px;border:1px solid rgba(220,228,255,.15);
+ border-radius:30px;background:rgba(7,12,38,.70);backdrop-filter:blur(12px);
+ box-shadow:0 20px 70px rgba(0,0,0,.28)
+}
+.clouds{width:min(690px,100%);display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;margin-top:30px}
+.cloud{
+ position:relative;border:0;cursor:pointer;color:#101633;font:600 16px Cairo;
+ min-height:82px;padding:20px 24px;border-radius:50px;
+ background:linear-gradient(180deg,#fff 0%,#dfe7ff 100%);
+ box-shadow:0 12px 30px rgba(0,0,0,.28),0 0 25px rgba(190,205,255,.16);
+ transition:.25s;isolation:isolate
+}
+.cloud:before,.cloud:after{content:"";position:absolute;background:inherit;border-radius:50%;z-index:-1}
+.cloud:before{width:52px;height:52px;left:25px;top:-13px}
+.cloud:after{width:70px;height:70px;right:25px;top:-25px}
+.cloud:hover{transform:translateY(-5px) scale(1.025);box-shadow:0 18px 40px rgba(0,0,0,.36),0 0 34px rgba(190,205,255,.3)}
+.cloud:active{transform:scale(.98)}
+.choice{
+ display:block;width:100%;margin:12px 0;padding:15px 18px;border-radius:18px;
+ border:1px solid rgba(220,228,255,.16);background:rgba(255,255,255,.07);
+ color:#f7f6ff;font:400 16px Cairo;cursor:pointer;transition:.2s
+}
+.choice:hover{background:rgba(255,255,255,.13);transform:translateY(-2px)}
+.back{margin-top:24px;background:none;border:0;color:#aeb7df;font:400 14px Cairo;cursor:pointer}
+.progress{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:5;color:#8f99c8;font-size:12px}
+.emoji{font-size:45px;margin-bottom:10px}
+.result{font-size:21px;line-height:2;color:#eeeaff}
+.music{
+ position:fixed;bottom:16px;left:16px;z-index:6;width:42px;height:42px;border-radius:50%;
+ border:1px solid rgba(255,255,255,.2);background:rgba(7,12,38,.65);color:white;cursor:pointer
+}
+.credit{position:fixed;bottom:25px;left:66px;z-index:6;font-size:12px;color:#8f99c8;direction:ltr}
+footer{font-size:12px;color:#7882b2;margin-top:20px}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes twinkle{from{transform:scale(.7);opacity:.3}to{transform:scale(1.4);opacity:1}}
+</style>
+</head>
+<body>
+<div class="starfield" id="stars"></div>
+<div class="progress" id="progress"></div>
+
+<main>
+<section class="screen" id="home">
+  <div class="star">✦</div>
+  <h1>ما بين النظرة والكلمة</h1>
+  <p>أريد أعرف شيئًا واحدًا…<br><b>شنو أول شعور لامس قلبك من شفتني أو حچيت وياي؟</b></p>
+  <div class="clouds">
+    <button class="cloud" onclick="openFirst()">☁️ أول شعور</button>
+    <button class="cloud" onclick="openLook()">☁️ أول نظرة</button>
+    <button class="cloud" onclick="openThought()">☁️ أول فكرة</button>
+    <button class="cloud" onclick="openNote()">☁️ أول ملاحظة</button>
+  </div>
+  <p class="subtitle">اختار الغيمة اللي تمثّل الشيء اللي تريد تتذكره أولًا.</p>
+</section>
+
+
+<section class="screen hidden" id="first">
+  <div class="card">
+    <div class="emoji">🌙</div><h2>أول شعور</h2>
+    <p>خلينا نرجع للحظة الأولى… بدون تفكير كثير. شنو كان أول شيء حسّيته؟</p>
+    <button class="choice" onclick="pick('feeling','فضول','حسّيت أريد أعرف عنك أكثر.')">فضول — أريد أعرف عنك أكثر.</button>
+    <button class="choice" onclick="pick('feeling','راحة','حسّيت بألفة غريبة، كأن وجودك مو غريب.')">راحة — ألفة غريبة.</button>
+    <button class="choice" onclick="pick('feeling','انجذاب','أكو شيء بيك شدّني من البداية.')">انجذاب — شيء بيك شدّني.</button>
+    <button class="choice" onclick="pick('feeling','ارتباك','ما عرفت شنو أحس، بس وجودك لخبطني بطريقة حلوة.')">ارتباك — ما عرفت أسميه.</button>
+    <button class="back" onclick="go('home')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="feelingNext">
+  <div class="card">
+    <div class="emoji">☁️</div><h2>وبعدها؟</h2>
+    <p>بعد ما انتهت أول لحظة، شنو الشيء اللي خلاك تنتبه إليّ أكثر؟</p>
+    <button class="choice" onclick="pick('reason','الكلام','طريقة كلامك والتفاصيل اللي كنت تقولها.')">كلامي وطريقة حچيّي</button>
+    <button class="choice" onclick="pick('reason','الحضور','مجرد وجودي وحضوري.')">حضوري</button>
+    <button class="choice" onclick="pick('reason','التفاصيل','تفاصيل صغيرة ما أعرف ليش بقيت ببالي.')">تفاصيل صغيرة</button>
+    <button class="choice" onclick="pick('reason','الوقت','الوقت اللي قضيته وياي.')">الوقت وياك</button>
+    <button class="back" onclick="go('first')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="look">
+  <div class="card">
+    <div class="emoji">👀</div><h2>أول نظرة</h2>
+    <p>شنو أول شيء لفت انتباهك؟</p>
+    <button class="choice" onclick="pick('look','النظرة','نظرتك وملامحك.')">نظرتي وملامحي</button>
+    <button class="choice" onclick="pick('look','الضحكة','ضحكتك أو تعابير وجهك.')">ضحكتي وتعابيري</button>
+    <button class="choice" onclick="pick('look','الحضور','حضورك كله، مو تفصيل واحد.')">حضوري</button>
+    <button class="choice" onclick="pick('look','شيء غامض','شيء ما قدرت أحدده إلى الآن.')">شيء ما قدرت أحدده</button>
+    <button class="back" onclick="go('home')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="lookNext">
+  <div class="card">
+    <div class="emoji">🌌</div><h2>إذا رجعت للحظة…</h2>
+    <p>هل تعتقد أن أول نظرة كانت مجرد لحظة عابرة، لو كان بيها شيء يستحق التذكر؟</p>
+    <button class="choice" onclick="pick('meaning','عابرة','كانت عابرة، بس بطريقة بقيت بالذاكرة.')">لحظة عابرة</button>
+    <button class="choice" onclick="pick('meaning','مهمة','كان بيها شيء من البداية.')">كان بيها شيء مهم</button>
+    <button class="choice" onclick="pick('meaning','لا أدري','إلى الآن ما أعرف… ولهذا يمكن هي مميزة.')">ما أدري</button>
+    <button class="back" onclick="go('look')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="thought">
+  <div class="card">
+    <div class="emoji">☁️</div><h2>أول فكرة</h2>
+    <p>أول فكرة حقيقية مرت ببالك عني؟</p>
+    <button class="choice" onclick="pick('thought','مختلف','هذا الشخص مختلف.')">«هذا الشخص مختلف.»</button>
+    <button class="choice" onclick="pick('thought','أريد أكثر','أريد أحچي وياه أكثر.')">«أريد أحچي وياه أكثر.»</button>
+    <button class="choice" onclick="pick('thought','فضول','ما أعرف عنه شيء، بس أريد أعرف.')">«أريد أعرف عنه أكثر.»</button>
+    <button class="choice" onclick="pick('thought','مفاجأة','ما توقعت يصير له حضور بذهني.')">«ما توقعت يصير له حضور.»</button>
+    <button class="back" onclick="go('home')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="thoughtNext">
+  <div class="card">
+    <div class="emoji">💭</div><h2>ومع الوقت؟</h2>
+    <p>شنو الشيء اللي تغيّر من أول فكرة إلى الآن؟</p>
+    <button class="choice" onclick="pick('change','قرب','صار وجوده أقرب إليّ.')">صار أقرب</button>
+    <button class="choice" onclick="pick('change','اهتمام','صرت أنتبه لتفاصيل أكثر.')">زاد اهتمامي</button>
+    <button class="choice" onclick="pick('change','فضول','بعدني أريد أعرف أكثر.')">بعدني فضولي</button>
+    <button class="choice" onclick="pick('change','شيء آخر','صار عندي شعور ما أعرف أوصفه.')">صار شيء ما أعرف أوصفه</button>
+    <button class="back" onclick="go('thought')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="note">
+  <div class="card">
+    <div class="emoji">🔭</div><h2>أول ملاحظة</h2>
+    <p>شنو التفصيل الصغير اللي لاحظته بيّ قبل أي شيء ثاني؟</p>
+    <button class="choice" onclick="pick('note','ضحكة','ضحكتك وتعابيرك.')">ضحكتي وتعابيري</button>
+    <button class="choice" onclick="pick('note','كلام','طريقة كلامي واختياري للكلمات.')">طريقة كلامي</button>
+    <button class="choice" onclick="pick('note','هدوء','هدوئي أو طاقتي.')">هدوئي / طاقتي</button>
+    <button class="choice" onclick="pick('note','تفصيل','تفصيل صغير جدًا، بس بقي بذاكرتي.')">تفصيل صغير جدًا</button>
+    <button class="back" onclick="go('home')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="noteNext">
+  <div class="card">
+    <div class="emoji">🫧</div><h2>ليش بقي ببالك؟</h2>
+    <p>إذا كان تفصيل صغير… شنو خلاه يبقى؟</p>
+    <button class="choice" onclick="pick('why','مميز','لأنه كان مميز بطريقة ما.')">لأنه كان مميز</button>
+    <button class="choice" onclick="pick('why','صادق','لأنه حسّيته عفوي وحقيقي.')">لأنه حسّيته حقيقي</button>
+    <button class="choice" onclick="pick('why','يشبهني','لأنه ذكرني بشيء مني.')">لأنه يشبهني بطريقة ما</button>
+    <button class="choice" onclick="pick('why','لا أدري','ما أعرف، بس ما نسيته.')">ما أعرف… بس ما نسيته</button>
+    <button class="back" onclick="go('note')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="meme">
+  <div class="card">
+    <div class="emoji">😭</div>
+    <h2>لحظة…</h2>
+    <p>كل هالإجابات وبالأخير تكول ماكو شعور؟ 👁️👄👁️</p>
+    <div style="font-size:70px;margin:20px">🫵🏻 😂</div>
+    <button class="cloud" onclick="go('finalQuestion')">☁️ كمل التحقيق</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="finalQuestion">
+  <div class="card">
+    <div class="emoji">🌙</div><h2>آخر سؤال</h2>
+    <p>بعيدًا عن كل الإجابات السابقة… إذا توصف شعورك تجاهي بكلمة وحدة، شتختار؟</p>
+    <button class="choice" onclick="finish('اهتمام','يمكن الكلمة الأصدق هي: اهتمام. لأن وجودك صار يعني لي شيء.')">اهتمام</button>
+    <button class="choice" onclick="finish('فضول','فضول… لأن بعدني أريد أعرفك أكثر.')">فضول</button>
+    <button class="choice" onclick="finish('راحة','راحة… لأن وياك ما أحس أني مضطر أكون شخص ثاني.')">راحة</button>
+    <button class="choice" onclick="finish('انجذاب','انجذاب… يمكن البداية كانت أبسط من أني أسميها، بس أكو شيء.')">انجذاب</button>
+    <button class="choice" onclick="finish('شيء لا اسم له','شيء ما عنده اسم لحد الآن… بس أكيد مو لا شيء.')">شيء ما إله اسم</button>
+  </div>
+</section>
+
+
+<section class="screen hidden" id="message">
+  <div class="card">
+    <div class="emoji">💌</div>
+    <h2>هسه دورك تحچي</h2>
+    <p>بعد كل هالأسئلة… إذا عندك شيء تريد توجهه للشخص المقابل، اكتبه هنا.</p>
+    <textarea id="messageInput" maxlength="1000"
+      placeholder="اكتب رسالتك هنا…"
+      style="width:100%;min-height:190px;resize:vertical;border:1px solid rgba(220,228,255,.18);
+      border-radius:22px;padding:18px;background:rgba(255,255,255,.07);color:#fff;
+      font:400 16px Cairo;outline:none;line-height:2;"></textarea>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;color:#858eb8;font-size:12px">
+      <span>اكتبها مثل ما تحب، بدون إجابة صحيحة أو خاطئة.</span>
+      <span id="counter">0 / 1000</span>
+    </div>
+    <button class="cloud" style="margin-top:22px" onclick="submitMessage()">☁️ أرسل الرسالة</button>
+    <button class="back" onclick="go('finalQuestion')">← أرجع</button>
+  </div>
+</section>
+
+<section class="screen hidden" id="result">
+  <div class="card">
+    <div class="star">✦</div><h2>إذن…</h2>
+    <p id="resultText" class="result"></p>
+    <p id="resultExtra"></p>
+    <div style="font-size:42px;margin:18px">🌌 ☁️ ✦</div>
+    <button class="cloud" onclick="go('home')">☁️ أريد أرجع</button>
+    <footer>بعض المشاعر تبدأ قبل أن نعرف اسمها.</footer>
+  </div>
+</section>
+</main>
+
+<button class="music" onclick="toggleMusic()" title="الموسيقى" aria-label="تشغيل أو إيقاف الموسيقى">♫</button>
+<div class="credit" id="credit">♫ Como el álamo</div>
+<audio id="audio" loop preload="none">
+  <source src="como_el_alamo.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const stars=document.getElementById('stars');
+for(let i=0;i<75;i++){
+ const s=document.createElement('span');
+ s.style.left=Math.random()*100+'vw';
+ s.style.top=Math.random()*100+'vh';
+ s.style.animationDelay=(Math.random()*3)+'s';
+ stars.appendChild(s);
+}
+const names={home:'',first:'01',feelingNext:'02',look:'01',lookNext:'02',thought:'01',thoughtNext:'02',note:'01',noteNext:'02',meme:'✦',finalQuestion:'✦',message:'✦',result:'✦'};
+function go(id){
+ document.querySelectorAll('.screen').forEach(x=>x.classList.add('hidden'));
+ document.getElementById(id).classList.remove('hidden');
+ document.getElementById('progress').textContent=names[id]||'';
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+let answers={};
+function openFirst(){go('first')}
+function openLook(){go('look')}
+function openThought(){go('thought')}
+function openNote(){go('note')}
+function pick(key,label,text){
+  answers[key]={label,text};
+  const next={feeling:'feelingNext',reason:'meme',look:'lookNext',meaning:'meme',
+              thought:'thoughtNext',change:'meme',note:'noteNext',why:'meme'};
+  go(next[key]||'meme');
+}
+function finish(label,text){
+  answers.final={label,text};
+  go('message');
+}
+function submitMessage(){
+  const input=document.getElementById('messageInput');
+  const message=input.value.trim();
+  if(!message){
+    input.focus();
+    input.placeholder='اكتب رسالة أولًا… 💌';
+    return;
+  }
+  const chosen=Object.values(answers).filter(Boolean).map(x=>x.label).slice(0,5).join('، ');
+  document.getElementById('resultText').textContent=answers.final.text;
+  document.getElementById('resultExtra').innerHTML =
+    '<b>ورسالتك:</b><br><span style="display:block;margin-top:12px;padding:18px;border-radius:20px;background:rgba(255,255,255,.07);line-height:2.1;">'+escapeHtml(message)+'</span>'+
+    '<small style="display:block;margin-top:15px;color:#858eb8;">ومن بين اختياراتك ظهر: '+escapeHtml(chosen||'شعور ما زال يتكوّن')+'</small>';
+  go('result');
+}
+function escapeHtml(text){
+  return text.replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m];});
+}
+document.getElementById('messageInput').addEventListener('input',function(){
+ document.getElementById('counter').textContent=this.value.length+' / 1000';
+});
+function toggleMusic(){
+ const a=document.getElementById('audio');
+ if(a.paused)a.play().catch(()=>alert('ملف الموسيقى (como_el_alamo.mp3) غير موجود بالموقع بعد.'));
+ else a.pause();
+}
+</script>
+</body>
+</html>
