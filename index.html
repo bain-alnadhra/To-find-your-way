@@ -920,10 +920,10 @@ function openForm(){
  go('exhibitForm');
 }
 function saveExhibit(){
-    const val=id=>document.getElementById(id).value.trim();
-    const type=val('exTypeOther')||pickedType;
-    if(!type){
-        const o=document.getElementById('exTypeOther');o.focus();o.placeholder='!...اختار نوع المعرض أو اكتبه';
+    const val = id => document.getElementById(id).value.trim();
+    const type = val('exTypeOther') || pickedType;
+    if (!type) {
+        const o = document.getElementById('exTypeOther'); o.focus(); o.placeholder = '!...اختار نوع المعرض أو اكتبه';
         return;
     }
     
@@ -942,36 +942,30 @@ function saveExhibit(){
 }
 
 function addCustomOptions(){
- document.querySelectorAll('.card').forEach(card=>{
-  const first=card.querySelector('.choice');
-  if(!first)return;
-  if(card.querySelector('[onclick^="openCustomTopic"]'))return;
-  const m=(first.getAttribute('onclick')||'').match(/^(pick|finish)\('([^']*)'/);
-  if(!m)return;
-  const isFinal=m[1]==='finish',key=m[2];
-  const toggle=document.createElement('button');
-  toggle.className='choice';toggle.textContent='✍️ شيء ثاني، أكتبه بنفسي';
-  const box=document.createElement('div');box.className='custom hidden';
-  const input=document.createElement('input');input.type='text';input.maxLength=120;
-  input.placeholder='اكتب وصفك أنت…';
-  const ok=document.createElement('button');ok.className='choice';ok.textContent='تأكيد ✦';
-  const send=function(){
-   const v=input.value.trim();
-   if(!v){input.focus();return;}
-   if(isFinal)finish(v,'«'+v+'»… هذا وصفك أنت، وهو الأصدق.');
-   else pick(key,v,'بكلماتي: '+v);
-   input.value='';box.classList.add('hidden');
-  };
-  ok.onclick=send;
-  input.addEventListener('keydown',e=>{if(e.key==='Enter')send();});
-  toggle.onclick=function(){box.classList.toggle('hidden');if(!box.classList.contains('hidden'))input.focus();};
-  box.appendChild(input);box.appendChild(ok);
-  const back=card.querySelector('.back');
-  if(back){card.insertBefore(toggle,back);card.insertBefore(box,back);}
-  else{card.appendChild(toggle);card.appendChild(box);}
- });
+    document.querySelectorAll('.card').forEach(card=>{
+        const first=card.querySelector('.choice');
+        if(!first)return;
+        if(card.querySelector('[onclick^="openCustomTopic"]'))return;
+        const m=(first.getAttribute('onclick')||'').match(/(pick|finish)\('([^']*)'\)/);
+        if(!m)return;
+        const isFinal=m[1]==='finish',key=m[2];
+        const toggle=document.createElement('button');
+        toggle.className='choice';toggle.textContent='شيء ثاني أكتبه بنفسي ✍️';
+        const box=document.createElement('div');box.className='custom hidden';
+        const input=document.createElement('input');input.type='text';input.maxLength=120;
+        input.placeholder='...اكتب وصفك أنت 🖋️';
+        const ok=document.createElement('button');ok.className='choice';ok.textContent='تأكيد ✨';
+        const send=function(){
+            const v=input.value.trim();
+            if(!v){input.focus();return;}
+            if(isFinal)finish(v,'» '+v+' « '+'.هذا وصفك أنت، وهو الأصدق 🤍');
+            else pick(key,v,': بكلماتي، '+v);
+            input.value='';box.classList.add('hidden');
+        };
+        ok.onclick=send;
+        input.onkeydown=e=>{if(e.key==='Enter')send();};
+        toggle.onclick=()=>{box.classList.toggle('hidden');if(!box.classList.contains('hidden'))input.focus();};
+        box.appendChild(input);box.appendChild(ok);
+        card.appendChild(toggle);card.appendChild(box);
+    });
 }
-addCustomOptions();
-</script>
-</body>
-</html>
