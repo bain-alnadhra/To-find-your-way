@@ -906,7 +906,7 @@ function renderRoom(){
   const del=document.createElement('button');del.className='back';del.style.marginTop='8px';
   del.textContent='🗑 احذفه من المتحف';
   del.onclick=function(){
-   if(confirm('تحذف هذا المعروض من المتحف؟')){museumMem[room].splice(i,1);persistMuseum();renderRoom();}
+   (confirm('تحذف هذا المعروض من المتحف؟')){museumMem[room].splice(i,1);persistMuseum();renderRoom();}
   };
   card.appendChild(del);list.appendChild(card);
  });
