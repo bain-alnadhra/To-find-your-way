@@ -681,11 +681,11 @@ footer{font-size:12px;color:#7882b2;margin-top:20px}
 </section>
 </main>
 
-<button class="music" onclick="document.getElementById('audio').paused ? document.getElementById('audio').play() : document.getElementById('audio').pause()" title="الموسيقى" aria-label="تشغيل أو إيقاف الموسيقى">🎵</button>
-<div class="credit" id="credit">🎵 music.m4a</div>
+<button class="music" onclick="var a=document.getElementById('audio'); a.paused?a.play():a.pause();" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #fff; border: 1px solid #ccc; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">🎵</button>
 <audio id="audio" loop preload="auto">
-  <source src="music.m4a" type="audio/mp4">
+  <source src="Como El Alamo Al Camino (Album Version)(M4A_128K).m4a" type="audio/mp4">
 </audio>
+
 
 
 <script>
