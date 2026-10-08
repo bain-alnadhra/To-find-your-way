@@ -920,15 +920,27 @@ function openForm(){
  go('exhibitForm');
 }
 function saveExhibit(){
- const val=id=>document.getElementById(id).value.trim();
- const type=val('exTypeOther')||pickedType;
- if(!type){
-  const o=document.getElementById('exTypeOther');o.focus();o.placeholder='اختار نوع المعرض أو اكتبه… ✍️';return;
- }
- museumMem[room].unshift({type:type,status:ROOMS[room].status,end:room==='ended'?val('exEnd'):'',start:val('exStart'),why:val('exWhy'),feel:val('exFeel')});
- persistMuseum();
- goBack();renderRoom();
+    const val=id=>document.getElementById(id).value.trim();
+    const type=val('exTypeOther')||pickedType;
+    if(!type){
+        const o=document.getElementById('exTypeOther');o.focus();o.placeholder='!...اختار نوع المعرض أو اكتبه';
+        return;
+    }
+    
+    museumMem[room].unshift({
+        type: type,
+        status: ROOMS[room].status,
+        start: val('exStart'),
+        end: ROOMS[room].room === 'ended' ? val('exEnd') : '',
+        why: val('exwhy'),
+        feel: val('exfeel')
+    });
+    
+    persistMuseum();
+    goBack();
+    renderRoom();
 }
+
 function addCustomOptions(){
  document.querySelectorAll('.card').forEach(card=>{
   const first=card.querySelector('.choice');
