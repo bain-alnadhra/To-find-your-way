@@ -877,12 +877,31 @@ function renderRoom(){
   const h=document.createElement('h3');h.textContent=it.type;
   const b=document.createElement('span');b.className='badge';b.textContent=it.status;
   h.appendChild(b);card.appendChild(h);
-  [['تاريخ الانتهاء',it.end],['تاريخ البداية',it.start],['سبب الحفظ',it.why],['شعورك وأنت تكتب',it.feel]].forEach(r=>{
-   if(!r[1])return;
-   const row=document.createElement('div');row.className='row';
-   const lb=document.createElement('b');lb.textContent=r[0]+': ';
-   row.appendChild(lb);row.appendChild(document.createTextNode(r[1]));
-   card.appendChild(row);
+          // 1. كود عرض الحقول وترتيبها ديناميكياً داخل المتاحف
+        let fields = [];
+        if (it.status === 'مستمر' || ROOMS[room].room === 'current') {
+            fields = [
+                ['تاريخ البداية', it.start],
+                ['سبب الحفظ', it.why],
+                ['شعورك وأنت تكتب', it.feel]
+            ];
+        } else {
+            fields = [
+                ['تاريخ البداية', it.start],
+                ['تاريخ الانتهاء', it.end],
+                ['سبب الحفظ', it.why],
+                ['شعورك وأنت تكتب', it.feel]
+            ];
+        }
+
+        fields.forEach(r => {
+            if (!r || !r[1]) return; // إذا كان النص فارغاً لا يطبعه
+            const row = document.createElement('div'); row.className = 'row';
+            const lb = document.createElement('b'); lb.textContent = r[0] + ': ';
+            row.appendChild(lb); row.appendChild(document.createTextNode(r[1]));
+            card.appendChild(row);
+        });
+
   });
   const del=document.createElement('button');del.className='back';del.style.marginTop='8px';
   del.textContent='🗑 احذفه من المتحف';
